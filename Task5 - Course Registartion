@@ -1,0 +1,262 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class Course {
+    private String code;
+    private String title;
+    private String description;
+    private int capacity;
+    private String schedule;
+    private int enrolledStudents;
+
+    public Course(String code, String title, String description, int capacity, String schedule) {
+        this.code = code;
+        this.title = title;
+        this.description = description;
+        this.capacity = capacity;
+        this.schedule = schedule;
+        this.enrolledStudents = 0;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public String getSchedule() {
+        return schedule;
+    }
+
+    public int getEnrolledStudents() {
+        return enrolledStudents;
+    }
+
+    public void enrollStudent() {
+        enrolledStudents++;
+    }
+
+    public void dropStudent() {
+        enrolledStudents--;
+    }
+
+    public boolean hasSpace() {
+        return enrolledStudents  capacity;
+    }
+
+    @Override
+    public String toString() {
+        return Course Code  + code + nTitle  + title + nDescription  + description +
+                nCapacity  + capacity + nSchedule  + schedule + nEnrolled Students  + enrolledStudents + n;
+    }
+}
+
+class Student {
+    private String id;
+    private String name;
+    private ListCourse registeredCourses;
+
+    public Student(String id, String name) {
+        this.id = id;
+        this.name = name;
+        this.registeredCourses = new ArrayList();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ListCourse getRegisteredCourses() {
+        return registeredCourses;
+    }
+
+    public void registerCourse(Course course) {
+        registeredCourses.add(course);
+        course.enrollStudent();
+    }
+
+    public void dropCourse(Course course) {
+        registeredCourses.remove(course);
+        course.dropStudent();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Student ID ).append(id).append(nName ).append(name).append(nRegistered Coursesn);
+        for (Course course  registeredCourses) {
+            sb.append(course.getTitle()).append( ().append(course.getCode()).append()n);
+        }
+        return sb.toString();
+    }
+}
+
+class CourseDatabase {
+    private ListCourse courses;
+
+    public CourseDatabase() {
+        this.courses = new ArrayList();
+    }
+
+    public void addCourse(Course course) {
+        courses.add(course);
+    }
+
+    public ListCourse getCourses() {
+        return courses;
+    }
+}
+
+class StudentDatabase {
+    private ListStudent students;
+
+    public StudentDatabase() {
+        this.students = new ArrayList();
+    }
+
+    public void addStudent(Student student) {
+        students.add(student);
+    }
+
+    public ListStudent getStudents() {
+        return students;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        CourseDatabase courseDatabase = new CourseDatabase();
+        StudentDatabase studentDatabase = new StudentDatabase();
+        Scanner scanner = new Scanner(System.in);
+
+         Adding some sample courses to the database
+        Course course1 = new Course(CSE101, Introduction to Computer Science, Introduction to programming concepts, 30, MonWedFri 1000-1130);
+        Course course2 = new Course(MTH202, Linear Algebra, Introduction to linear algebra, 25, TueThu 1300-1430);
+        courseDatabase.addCourse(course1);
+        courseDatabase.addCourse(course2);
+
+        while (true) {
+            System.out.println(1. Display Course Listing);
+            System.out.println(2. Student Registration);
+            System.out.println(3. Course Removal);
+            System.out.println(4. Exit);
+            System.out.print(Choose an option );
+            int choice = scanner.nextInt();
+            scanner.nextLine();  Consume newline character
+
+            switch (choice) {
+                case 1
+                    displayCourseListing(courseDatabase);
+                    break;
+                case 2
+                    studentRegistration(studentDatabase, courseDatabase, scanner);
+                    break;
+                case 3
+                    courseRemoval(studentDatabase, courseDatabase, scanner);
+                    break;
+                case 4
+                    System.out.println(Exiting...);
+                    scanner.close();
+                    System.exit(0);
+                default
+                    System.out.println(Invalid option.);
+            }
+        }
+    }
+
+    public static void displayCourseListing(CourseDatabase courseDatabase) {
+        System.out.println(Course Listing);
+        ListCourse courses = courseDatabase.getCourses();
+        for (Course course  courses) {
+            System.out.println(course);
+        }
+    }
+
+    public static void studentRegistration(StudentDatabase studentDatabase, CourseDatabase courseDatabase, Scanner scanner) {
+        System.out.print(Enter student ID );
+        String studentId = scanner.nextLine();
+        System.out.print(Enter student name );
+        String studentName = scanner.nextLine();
+
+        Student student = new Student(studentId, studentName);
+        studentDatabase.addStudent(student);
+
+        displayCourseListing(courseDatabase);
+
+        System.out.print(Enter the course code to register );
+        String courseCode = scanner.nextLine();
+
+        Course selectedCourse = null;
+        for (Course course  courseDatabase.getCourses()) {
+            if (course.getCode().equals(courseCode)) {
+                selectedCourse = course;
+                break;
+            }
+        }
+
+        if (selectedCourse == null) {
+            System.out.println(Course not found.);
+            return;
+        }
+
+        if (selectedCourse.hasSpace()) {
+            student.registerCourse(selectedCourse);
+            System.out.println(Registration successful.);
+        } else {
+            System.out.println(Course is full. Registration failed.);
+        }
+    }
+
+    public static void courseRemoval(StudentDatabase studentDatabase, CourseDatabase courseDatabase, Scanner scanner) {
+        System.out.print(Enter student ID );
+        String studentId = scanner.nextLine();
+
+        Student selectedStudent = null;
+        for (Student student  studentDatabase.getStudents()) {
+            if (student.getId().equals(studentId)) {
+                selectedStudent = student;
+                break;
+            }
+        }
+
+        if (selectedStudent == null) {
+            System.out.println(Student not found.);
+            return;
+        }
+
+        System.out.println(selectedStudent);
+        System.out.print(Enter the course code to remove );
+        String courseCode = scanner.nextLine();
+
+        Course selectedCourse = null;
+        for (Course course  selectedStudent.getRegisteredCourses()) {
+            if (course.getCode().equals(courseCode)) {
+                selectedCourse = course;
+                break;
+            }
+        }
+
+        if (selectedCourse == null) {
+            System.out.println(Course not found in student's registration.);
+            return;
+        }
+
+        selectedStudent.dropCourse(selectedCourse);
+        System.out.println(Course removal successful.);
+    }
+}
